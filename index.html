@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>社交名片 - HELLO DIGITAL MASTER</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #0a0a0a;
+            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            padding: 20px;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 380px;
+            background: #141414;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid #222;
+            position: relative;
+        }
+
+        /* 顶部装饰 */
+        .header-accent {
+            height: 4px;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            position: relative;
+        }
+
+        .header-accent::after {
+            content: '';
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #00d4ff;
+            box-shadow: 0 0 10px #00d4ff;
+        }
+
+        .header-accent::before {
+            content: '';
+            position: absolute;
+            right: 32px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #7b2cbf;
+            box-shadow: 0 0 10px #7b2cbf;
+        }
+
+        /* 主标题区 */
+        .main-header {
+            padding: 30px 24px 20px;
+            text-align: center;
+        }
+
+        .main-title {
+            font-size: 28px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, #fff 0%, #aaa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .sub-title {
+            font-size: 10px;
+            letter-spacing: 4px;
+            color: #555;
+            text-transform: uppercase;
+        }
+
+        /* 分隔线装饰 */
+        .divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 24px;
+            gap: 8px;
+        }
+
+        .divider-line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #333, transparent);
+        }
+
+        .divider-dot {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: #00d4ff;
+        }
+
+        /* 个人信息区 */
+        .profile-section {
+            padding: 20px 24px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .info-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid #222;
+            border-radius: 10px;
+            padding: 12px 14px;
+            position: relative;
+        }
+
+        .info-label {
+            font-size: 9px;
+            color: #555;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .info-value {
+            font-size: 14px;
+            color: #eee;
+            font-weight: 600;
+        }
+
+        .info-item:nth-child(1) .info-value {
+            color: #00d4ff;
+        }
+
+        .info-item:nth-child(2) .info-value {
+            color: #7b2cbf;
+        }
+
+        /* 社交能量条 */
+        .energy-section {
+            padding: 0 24px 20px;
+        }
+
+        .energy-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .energy-label {
+            font-size: 10px;
+            color: #555;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .energy-status {
+            font-size: 10px;
+            color: #00d4ff;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .energy-bar {
+            display: flex;
+            gap: 8px;
+        }
+
+        .star {
+            width: 28px;
+            height: 28px;
+            background: #222;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .star.active {
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+        }
+
+        .star.inactive {
+            color: #333;
+        }
+
+        /* 三个区块 */
+        .sections-area {
+            padding: 0 24px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .section-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid #222;
+            border-radius: 12px;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s;
+        }
+
+        .section-card:hover {
+            border-color: #333;
+            background: rgba(255,255,255,0.04);
+        }
+
+        .section-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #333;
+            position: relative;
+        }
+
+        .section-dot::after {
+            content: '';
+            position: absolute;
+            inset: 2px;
+            border-radius: 50%;
+            background: #00d4ff;
+        }
+
+        .section-card:nth-child(2) .section-dot::after {
+            background: #7b2cbf;
+        }
+
+        .section-card:nth-child(3) .section-dot::after {
+            background: #ff6b35;
+        }
+
+        .section-title {
+            font-size: 13px;
+            color: #ccc;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .section-right {
+            text-align: right;
+        }
+
+        .section-date {
+            font-size: 9px;
+            color: #555;
+            letter-spacing: 1px;
+        }
+
+        .section-number {
+            font-size: 18px;
+            font-weight: 800;
+            color: #fff;
+            line-height: 1;
+        }
+
+        /* TAGS区域 */
+        .tags-section {
+            padding: 0 24px 20px;
+        }
+
+        .tags-header {
+            font-size: 10px;
+            color: #555;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tag {
+            background: rgba(0, 212, 255, 0.08);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 12px;
+            color: #00d4ff;
+            font-weight: 500;
+            transition: all 0.3s;
+            cursor: default;
+        }
+
+        .tag:hover {
+            background: rgba(0, 212, 255, 0.15);
+            border-color: rgba(0, 212, 255, 0.4);
+            transform: translateY(-1px);
+        }
+
+        /* 社交联系方式 */
+        .social-section {
+            padding: 0 24px 20px;
+        }
+
+        .social-header {
+            font-size: 10px;
+            color: #555;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 10px;
+        }
+
+        .social-link {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid #222;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 14px;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .social-link:hover {
+            border-color: #00d4ff;
+            color: #00d4ff;
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        /* HAVE & WANT */
+        .exchange-section {
+            padding: 0 24px 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .exchange-box {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid #222;
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .exchange-label {
+            font-size: 10px;
+            color: #555;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .exchange-label-icon {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .have-icon {
+            background: #00d4ff;
+            box-shadow: 0 0 8px rgba(0, 212, 255, 0.5);
+        }
+
+        .want-icon {
+            background: #ff6b35;
+            box-shadow: 0 0 8px rgba(255, 107, 53, 0.5);
+        }
+
+        .exchange-content {
+            font-size: 13px;
+            color: #888;
+            line-height: 1.6;
+        }
+
+        .exchange-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+
+        .exchange-bullet {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: #444;
+        }
+
+        /* 底部 */
+        .footer {
+            padding: 16px 24px 24px;
+            text-align: center;
+        }
+
+        .footer-text {
+            font-size: 9px;
+            color: #333;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        /* 响应式 */
+        @media (max-width: 420px) {
+            .card {
+                border-radius: 16px;
+            }
+        }
+
+        /* 装饰性角落 */
+        .corner-decor {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            opacity: 0.03;
+        }
+
+        .corner-tl {
+            top: 0;
+            left: 0;
+            border-top: 2px solid #00d4ff;
+            border-left: 2px solid #00d4ff;
+            border-radius: 20px 0 0 0;
+        }
+
+        .corner-br {
+            bottom: 0;
+            right: 0;
+            border-bottom: 2px solid #7b2cbf;
+            border-right: 2px solid #7b2cbf;
+            border-radius: 0 0 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="corner-decor corner-tl"></div>
+        <div class="corner-decor corner-br"></div>
+        
+        <div class="header-accent"></div>
+        
+        <div class="main-header">
+            <div class="main-title">HELLO DIGITAL MASTER</div>
+            <div class="sub-title">IN THE NEW DIGITAL ERA</div>
+        </div>
+
+        <div class="divider">
+            <div class="divider-line"></div>
+            <div class="divider-dot"></div>
+            <div class="divider-line"></div>
+        </div>
+
+        <div class="profile-section">
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">NAME</div>
+                    <div class="info-value">您的姓名</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">AGE</div>
+                    <div class="info-value">25</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">PLACE</div>
+                    <div class="info-value">北京</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">JOB</div>
+                    <div class="info-value">设计师</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="energy-section">
+            <div class="energy-header">
+                <div class="energy-label">SOCIAL ENERGY</div>
+                <div class="energy-status">FOUR STARS</div>
+            </div>
+            <div class="energy-bar">
+                <div class="star active">★</div>
+                <div class="star active">★</div>
+                <div class="star active">★</div>
+                <div class="star active">★</div>
+                <div class="star inactive">★</div>
+            </div>
+        </div>
+
+        <div class="sections-area">
+            <div class="section-card">
+                <div class="section-left">
+                    <div class="section-dot"></div>
+                    <div class="section-title">THE FIRST</div>
+                </div>
+                <div class="section-right">
+                    <div class="section-date">2024.01.01</div>
+                    <div class="section-number">01</div>
+                </div>
+            </div>
+            <div class="section-card">
+                <div class="section-left">
+                    <div class="section-dot"></div>
+                    <div class="section-title">THE SECOND</div>
+                </div>
+                <div class="section-right">
+                    <div class="section-date">2024.02.01</div>
+                    <div class="section-number">02</div>
+                </div>
+            </div>
+            <div class="section-card">
+                <div class="section-left">
+                    <div class="section-dot"></div>
+                    <div class="section-title">THE THIRD</div>
+                </div>
+                <div class="section-right">
+                    <div class="section-date">2024.03.01</div>
+                    <div class="section-number">03</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tags-section">
+            <div class="tags-header">2-4 KEY TAGS</div>
+            <div class="tags-container">
+                <div class="tag">#标签一</div>
+                <div class="tag">#标签二</div>
+                <div class="tag">#标签三</div>
+            </div>
+        </div>
+
+        <div class="social-section">
+            <div class="social-header">SOCIAL CONTACTS</div>
+            <div class="social-links">
+                <a class="social-link" href="#" title="WeChat">微</a>
+                <a class="social-link" href="#" title="Weibo">博</a>
+                <a class="social-link" href="#" title="GitHub">G</a>
+                <a class="social-link" href="#" title="Twitter">T</a>
+                <a class="social-link" href="#" title="Email">@</a>
+            </div>
+        </div>
+
+        <div class="exchange-section">
+            <div class="exchange-box">
+                <div class="exchange-label">
+                    <div class="exchange-label-icon have-icon"></div>
+                    HAVE
+                </div>
+                <div class="exchange-content">
+                    <div class="exchange-item">
+                        <div class="exchange-bullet"></div>
+                        <span>技能一</span>
+                    </div>
+                    <div class="exchange-item">
+                        <div class="exchange-bullet"></div>
+                        <span>技能二</span>
+                    </div>
+                </div>
+            </div>
+            <div class="exchange-box">
+                <div class="exchange-label">
+                    <div class="exchange-label-icon want-icon"></div>
+                    WANT
+                </div>
+                <div class="exchange-content">
+                    <div class="exchange-item">
+                        <div class="exchange-bullet"></div>
+                        <span>目标一</span>
+                    </div>
+                    <div class="exchange-item">
+                        <div class="exchange-bullet"></div>
+                        <span>目标二</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="footer-text">THANK YOU FOR READING</div>
+        </div>
+    </div>
+</body>
+</html>
