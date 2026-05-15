@@ -2,8 +2,9 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>社交名片 - HELLO DIGITAL MASTER</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -13,94 +14,144 @@
 
         body {
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: #0a0a0a;
-            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: #050505;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
             padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
         }
 
+        /* 导出按钮 */
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            padding: 12px 20px;
+            background: #141414;
+            border: 1px solid #222;
+            border-radius: 12px;
+            position: sticky;
+            top: 10px;
+            z-index: 100;
+        }
+
+        .btn {
+            padding: 8px 20px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            background: #1a1a1a;
+            color: #ccc;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .btn:hover {
+            border-color: #00d4ff;
+            color: #00d4ff;
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        .btn.primary {
+            background: linear-gradient(135deg, #00d4ff, #7b2cbf);
+            color: #fff;
+            border: none;
+            font-weight: 600;
+        }
+
+        .btn.primary:hover {
+            opacity: 0.9;
+            color: #fff;
+        }
+
+        .hint {
+            font-size: 11px;
+            color: #555;
+            text-align: center;
+            margin-top: 4px;
+        }
+
+        /* 名片主体 */
         .card {
             width: 100%;
-            max-width: 380px;
-            background: #141414;
-            border-radius: 20px;
+            max-width: 360px;
+            background: #0d0d0d;
+            border-radius: 16px;
             overflow: hidden;
-            border: 1px solid #222;
+            border: 1px solid #1a1a1a;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+        }
+
+        /* 顶部渐变条 */
+        .top-bar {
+            height: 3px;
+            background: linear-gradient(90deg, #00d4ff 0%, #7b2cbf 70%, #ff6b35 100%);
             position: relative;
         }
 
-        /* 顶部装饰 */
-        .header-accent {
-            height: 4px;
-            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
-            position: relative;
-        }
-
-        .header-accent::after {
+        .top-bar::after {
             content: '';
             position: absolute;
-            right: 20px;
+            right: 16px;
             top: 50%;
             transform: translateY(-50%);
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
             background: #00d4ff;
-            box-shadow: 0 0 10px #00d4ff;
+            box-shadow: 0 0 8px rgba(0, 212, 255, 0.6);
         }
 
-        .header-accent::before {
+        .top-bar::before {
             content: '';
             position: absolute;
-            right: 32px;
+            right: 26px;
             top: 50%;
             transform: translateY(-50%);
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
             background: #7b2cbf;
-            box-shadow: 0 0 10px #7b2cbf;
+            box-shadow: 0 0 8px rgba(123, 44, 191, 0.6);
         }
 
-        /* 主标题区 */
+        /* 主标题 */
         .main-header {
-            padding: 30px 24px 20px;
+            padding: 28px 20px 16px;
             text-align: center;
         }
 
         .main-title {
-            font-size: 28px;
+            font-size: 24px;
             font-weight: 900;
-            letter-spacing: 2px;
-            background: linear-gradient(135deg, #fff 0%, #aaa 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 8px;
+            letter-spacing: 1px;
+            color: #e8e8e8;
+            margin-bottom: 6px;
+            line-height: 1.2;
         }
 
         .sub-title {
-            font-size: 10px;
-            letter-spacing: 4px;
-            color: #555;
+            font-size: 9px;
+            letter-spacing: 3px;
+            color: #444;
             text-transform: uppercase;
         }
 
-        /* 分隔线装饰 */
+        /* 分隔线 */
         .divider {
             display: flex;
             align-items: center;
-            justify-content: center;
-            padding: 0 24px;
+            padding: 0 20px;
             gap: 8px;
         }
 
         .divider-line {
             flex: 1;
             height: 1px;
-            background: linear-gradient(90deg, transparent, #333, transparent);
+            background: linear-gradient(90deg, transparent, #222, transparent);
         }
 
         .divider-dot {
@@ -108,39 +159,47 @@
             height: 4px;
             border-radius: 50%;
             background: #00d4ff;
+            flex-shrink: 0;
         }
 
-        /* 个人信息区 */
+        /* 个人信息 */
         .profile-section {
-            padding: 20px 24px;
+            padding: 16px 20px;
         }
 
         .info-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
+            gap: 10px;
         }
 
         .info-item {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid #222;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid #1a1a1a;
             border-radius: 10px;
-            padding: 12px 14px;
-            position: relative;
+            padding: 10px 12px;
         }
 
         .info-label {
-            font-size: 9px;
-            color: #555;
+            font-size: 8px;
+            color: #444;
             letter-spacing: 2px;
             text-transform: uppercase;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
 
         .info-value {
-            font-size: 14px;
-            color: #eee;
+            font-size: 13px;
+            color: #ddd;
             font-weight: 600;
+            min-height: 18px;
+            outline: none;
+            border-bottom: 1px dashed transparent;
+            transition: border-color 0.2s;
+        }
+
+        .info-value:focus {
+            border-bottom-color: #00d4ff;
         }
 
         .info-item:nth-child(1) .info-value {
@@ -151,27 +210,27 @@
             color: #7b2cbf;
         }
 
-        /* 社交能量条 */
+        /* 社交能量 */
         .energy-section {
-            padding: 0 24px 20px;
+            padding: 0 20px 14px;
         }
 
         .energy-header {
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            margin-bottom: 12px;
+            align-items: center;
+            margin-bottom: 8px;
         }
 
         .energy-label {
-            font-size: 10px;
-            color: #555;
+            font-size: 9px;
+            color: #444;
             letter-spacing: 2px;
             text-transform: uppercase;
         }
 
         .energy-status {
-            font-size: 10px;
+            font-size: 9px;
             color: #00d4ff;
             font-weight: 600;
             letter-spacing: 1px;
@@ -179,66 +238,70 @@
 
         .energy-bar {
             display: flex;
-            gap: 8px;
+            gap: 6px;
         }
 
         .star {
-            width: 28px;
-            height: 28px;
-            background: #222;
+            width: 32px;
+            height: 32px;
+            background: #161616;
             border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 14px;
-            transition: all 0.3s;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid #1a1a1a;
+            user-select: none;
         }
 
         .star.active {
             background: linear-gradient(135deg, #00d4ff, #0099cc);
-            box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+            color: #fff;
+            border-color: transparent;
+            box-shadow: 0 0 12px rgba(0, 212, 255, 0.25);
         }
 
         .star.inactive {
             color: #333;
         }
 
+        .star:hover {
+            border-color: #333;
+        }
+
         /* 三个区块 */
         .sections-area {
-            padding: 0 24px 20px;
+            padding: 0 20px 12px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
 
         .section-card {
-            background: rgba(255,255,255,0.02);
-            border: 1px solid #222;
-            border-radius: 12px;
-            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.015);
+            border: 1px solid #1a1a1a;
+            border-radius: 10px;
+            padding: 12px 14px;
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            transition: all 0.3s;
-        }
-
-        .section-card:hover {
-            border-color: #333;
-            background: rgba(255,255,255,0.04);
+            align-items: center;
         }
 
         .section-left {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
         .section-dot {
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            background: #333;
+            background: #1a1a1a;
             position: relative;
+            flex-shrink: 0;
         }
 
         .section-dot::after {
@@ -258,10 +321,16 @@
         }
 
         .section-title {
-            font-size: 13px;
-            color: #ccc;
+            font-size: 12px;
+            color: #bbb;
             font-weight: 600;
             letter-spacing: 1px;
+            outline: none;
+            min-width: 80px;
+        }
+
+        .section-title:focus {
+            color: #fff;
         }
 
         .section-right {
@@ -269,211 +338,246 @@
         }
 
         .section-date {
-            font-size: 9px;
-            color: #555;
+            font-size: 8px;
+            color: #444;
             letter-spacing: 1px;
+            margin-bottom: 2px;
+            outline: none;
+        }
+
+        .section-date:focus {
+            color: #888;
         }
 
         .section-number {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 800;
-            color: #fff;
+            color: #eee;
             line-height: 1;
+            outline: none;
         }
 
-        /* TAGS区域 */
+        .section-number:focus {
+            color: #fff;
+        }
+
+        /* TAGS */
         .tags-section {
-            padding: 0 24px 20px;
+            padding: 0 20px 14px;
         }
 
         .tags-header {
-            font-size: 10px;
-            color: #555;
+            font-size: 9px;
+            color: #444;
             letter-spacing: 2px;
             text-transform: uppercase;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .tags-container {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 6px;
         }
 
         .tag {
-            background: rgba(0, 212, 255, 0.08);
-            border: 1px solid rgba(0, 212, 255, 0.2);
-            border-radius: 20px;
-            padding: 6px 14px;
-            font-size: 12px;
+            background: rgba(0, 212, 255, 0.06);
+            border: 1px solid rgba(0, 212, 255, 0.15);
+            border-radius: 16px;
+            padding: 5px 12px;
+            font-size: 11px;
             color: #00d4ff;
             font-weight: 500;
-            transition: all 0.3s;
-            cursor: default;
+            outline: none;
+            cursor: text;
+            transition: all 0.2s;
         }
 
-        .tag:hover {
-            background: rgba(0, 212, 255, 0.15);
-            border-color: rgba(0, 212, 255, 0.4);
-            transform: translateY(-1px);
+        .tag:focus {
+            background: rgba(0, 212, 255, 0.12);
+            border-color: rgba(0, 212, 255, 0.35);
+        }
+
+        .tag-add {
+            background: transparent;
+            border: 1px dashed #333;
+            color: #555;
+            cursor: pointer;
+            font-size: 16px;
+            line-height: 1;
+            padding: 3px 10px;
+        }
+
+        .tag-add:hover {
+            border-color: #00d4ff;
+            color: #00d4ff;
         }
 
         /* 社交联系方式 */
         .social-section {
-            padding: 0 24px 20px;
+            padding: 0 20px 14px;
         }
 
         .social-header {
-            font-size: 10px;
-            color: #555;
+            font-size: 9px;
+            color: #444;
             letter-spacing: 2px;
             text-transform: uppercase;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .social-links {
             display: flex;
-            gap: 10px;
+            gap: 8px;
         }
 
         .social-link {
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            background: rgba(255,255,255,0.03);
-            border: 1px solid #222;
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid #1a1a1a;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #666;
-            font-size: 14px;
-            transition: all 0.3s;
+            color: #555;
+            font-size: 12px;
             text-decoration: none;
+            transition: all 0.2s;
+            outline: none;
+            cursor: text;
         }
 
-        .social-link:hover {
+        .social-link:focus {
             border-color: #00d4ff;
             color: #00d4ff;
-            background: rgba(0, 212, 255, 0.05);
         }
 
         /* HAVE & WANT */
         .exchange-section {
-            padding: 0 24px 24px;
+            padding: 0 20px 20px;
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
+            gap: 10px;
         }
 
         .exchange-box {
-            background: rgba(255,255,255,0.02);
-            border: 1px solid #222;
-            border-radius: 12px;
-            padding: 16px;
+            background: rgba(255, 255, 255, 0.015);
+            border: 1px solid #1a1a1a;
+            border-radius: 10px;
+            padding: 12px;
         }
 
         .exchange-label {
-            font-size: 10px;
-            color: #555;
+            font-size: 9px;
+            color: #444;
             letter-spacing: 2px;
             text-transform: uppercase;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
         }
 
         .exchange-label-icon {
-            width: 6px;
-            height: 6px;
+            width: 5px;
+            height: 5px;
             border-radius: 50%;
         }
 
         .have-icon {
             background: #00d4ff;
-            box-shadow: 0 0 8px rgba(0, 212, 255, 0.5);
+            box-shadow: 0 0 6px rgba(0, 212, 255, 0.4);
         }
 
         .want-icon {
             background: #ff6b35;
-            box-shadow: 0 0 8px rgba(255, 107, 53, 0.5);
+            box-shadow: 0 0 6px rgba(255, 107, 53, 0.4);
         }
 
         .exchange-content {
-            font-size: 13px;
-            color: #888;
-            line-height: 1.6;
+            font-size: 12px;
+            color: #777;
+            line-height: 1.7;
         }
 
         .exchange-item {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             gap: 6px;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
         }
 
         .exchange-bullet {
             width: 4px;
             height: 4px;
             border-radius: 50%;
-            background: #444;
+            background: #333;
+            margin-top: 7px;
+            flex-shrink: 0;
+        }
+
+        .exchange-text {
+            outline: none;
+            min-height: 18px;
+            border-bottom: 1px dashed transparent;
+            transition: border-color 0.2s;
+        }
+
+        .exchange-text:focus {
+            border-bottom-color: rgba(0, 212, 255, 0.3);
+            color: #aaa;
         }
 
         /* 底部 */
         .footer {
-            padding: 16px 24px 24px;
+            padding: 14px 20px 20px;
             text-align: center;
         }
 
         .footer-text {
-            font-size: 9px;
+            font-size: 8px;
             color: #333;
             letter-spacing: 3px;
             text-transform: uppercase;
         }
 
-        /* 响应式 */
-        @media (max-width: 420px) {
-            .card {
-                border-radius: 16px;
+        /* 编辑指示 */
+        [contenteditable="true"]:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        [contenteditable="true"]:empty::before {
+            content: attr(data-placeholder);
+            color: #333;
+            font-weight: 400;
+        }
+
+        /* 导出时隐藏按钮 */
+        @media print {
+            .toolbar {
+                display: none !important;
             }
-        }
-
-        /* 装饰性角落 */
-        .corner-decor {
-            position: absolute;
-            width: 60px;
-            height: 60px;
-            opacity: 0.03;
-        }
-
-        .corner-tl {
-            top: 0;
-            left: 0;
-            border-top: 2px solid #00d4ff;
-            border-left: 2px solid #00d4ff;
-            border-radius: 20px 0 0 0;
-        }
-
-        .corner-br {
-            bottom: 0;
-            right: 0;
-            border-bottom: 2px solid #7b2cbf;
-            border-right: 2px solid #7b2cbf;
-            border-radius: 0 0 20px 0;
+            body {
+                padding: 0;
+                background: #fff;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="card">
-        <div class="corner-decor corner-tl"></div>
-        <div class="corner-decor corner-br"></div>
-        
-        <div class="header-accent"></div>
-        
+    <div class="toolbar">
+        <button class="btn primary" onclick="exportPDF()">导出 PDF</button>
+        <button class="btn" onclick="resetData()">重置内容</button>
+    </div>
+    <div class="hint">点击任意文字即可编辑，点击星星可切换能量等级</div>
+
+    <div class="card" id="card">
+        <div class="top-bar"></div>
+
         <div class="main-header">
-            <div class="main-title">HELLO DIGITAL MASTER</div>
-            <div class="sub-title">IN THE NEW DIGITAL ERA</div>
+            <div class="main-title" contenteditable="true" data-placeholder="HELLO DIGITAL MASTER">HELLO DIGITAL MASTER</div>
+            <div class="sub-title" contenteditable="true" data-placeholder="IN THE NEW DIGITAL ERA">IN THE NEW DIGITAL ERA</div>
         </div>
 
         <div class="divider">
@@ -486,19 +590,19 @@
             <div class="info-grid">
                 <div class="info-item">
                     <div class="info-label">NAME</div>
-                    <div class="info-value">您的姓名</div>
+                    <div class="info-value" contenteditable="true" data-placeholder="您的姓名">您的姓名</div>
                 </div>
                 <div class="info-item">
                     <div class="info-label">AGE</div>
-                    <div class="info-value">25</div>
+                    <div class="info-value" contenteditable="true" data-placeholder="25">25</div>
                 </div>
                 <div class="info-item">
                     <div class="info-label">PLACE</div>
-                    <div class="info-value">北京</div>
+                    <div class="info-value" contenteditable="true" data-placeholder="北京">北京</div>
                 </div>
                 <div class="info-item">
                     <div class="info-label">JOB</div>
-                    <div class="info-value">设计师</div>
+                    <div class="info-value" contenteditable="true" data-placeholder="设计师">设计师</div>
                 </div>
             </div>
         </div>
@@ -506,14 +610,14 @@
         <div class="energy-section">
             <div class="energy-header">
                 <div class="energy-label">SOCIAL ENERGY</div>
-                <div class="energy-status">FOUR STARS</div>
+                <div class="energy-status" id="energyText">FOUR STARS</div>
             </div>
-            <div class="energy-bar">
-                <div class="star active">★</div>
-                <div class="star active">★</div>
-                <div class="star active">★</div>
-                <div class="star active">★</div>
-                <div class="star inactive">★</div>
+            <div class="energy-bar" id="energyBar">
+                <div class="star active" data-index="0">★</div>
+                <div class="star active" data-index="1">★</div>
+                <div class="star active" data-index="2">★</div>
+                <div class="star active" data-index="3">★</div>
+                <div class="star inactive" data-index="4">★</div>
             </div>
         </div>
 
@@ -521,52 +625,53 @@
             <div class="section-card">
                 <div class="section-left">
                     <div class="section-dot"></div>
-                    <div class="section-title">THE FIRST</div>
+                    <div class="section-title" contenteditable="true" data-placeholder="THE FIRST">THE FIRST</div>
                 </div>
                 <div class="section-right">
-                    <div class="section-date">2024.01.01</div>
-                    <div class="section-number">01</div>
+                    <div class="section-date" contenteditable="true" data-placeholder="2024.01.01">2024.01.01</div>
+                    <div class="section-number" contenteditable="true" data-placeholder="01">01</div>
                 </div>
             </div>
             <div class="section-card">
                 <div class="section-left">
                     <div class="section-dot"></div>
-                    <div class="section-title">THE SECOND</div>
+                    <div class="section-title" contenteditable="true" data-placeholder="THE SECOND">THE SECOND</div>
                 </div>
                 <div class="section-right">
-                    <div class="section-date">2024.02.01</div>
-                    <div class="section-number">02</div>
+                    <div class="section-date" contenteditable="true" data-placeholder="2024.02.01">2024.02.01</div>
+                    <div class="section-number" contenteditable="true" data-placeholder="02">02</div>
                 </div>
             </div>
             <div class="section-card">
                 <div class="section-left">
                     <div class="section-dot"></div>
-                    <div class="section-title">THE THIRD</div>
+                    <div class="section-title" contenteditable="true" data-placeholder="THE THIRD">THE THIRD</div>
                 </div>
                 <div class="section-right">
-                    <div class="section-date">2024.03.01</div>
-                    <div class="section-number">03</div>
+                    <div class="section-date" contenteditable="true" data-placeholder="2024.03.01">2024.03.01</div>
+                    <div class="section-number" contenteditable="true" data-placeholder="03">03</div>
                 </div>
             </div>
         </div>
 
         <div class="tags-section">
             <div class="tags-header">2-4 KEY TAGS</div>
-            <div class="tags-container">
-                <div class="tag">#标签一</div>
-                <div class="tag">#标签二</div>
-                <div class="tag">#标签三</div>
+            <div class="tags-container" id="tagsContainer">
+                <div class="tag" contenteditable="true" data-placeholder="#标签一">#标签一</div>
+                <div class="tag" contenteditable="true" data-placeholder="#标签二">#标签二</div>
+                <div class="tag" contenteditable="true" data-placeholder="#标签三">#标签三</div>
+                <div class="tag tag-add" onclick="addTag()">+</div>
             </div>
         </div>
 
         <div class="social-section">
             <div class="social-header">SOCIAL CONTACTS</div>
             <div class="social-links">
-                <a class="social-link" href="#" title="WeChat">微</a>
-                <a class="social-link" href="#" title="Weibo">博</a>
-                <a class="social-link" href="#" title="GitHub">G</a>
-                <a class="social-link" href="#" title="Twitter">T</a>
-                <a class="social-link" href="#" title="Email">@</a>
+                <div class="social-link" contenteditable="true" data-placeholder="微">微</div>
+                <div class="social-link" contenteditable="true" data-placeholder="博">博</div>
+                <div class="social-link" contenteditable="true" data-placeholder="G">G</div>
+                <div class="social-link" contenteditable="true" data-placeholder="T">T</div>
+                <div class="social-link" contenteditable="true" data-placeholder="@">@</div>
             </div>
         </div>
 
@@ -579,11 +684,11 @@
                 <div class="exchange-content">
                     <div class="exchange-item">
                         <div class="exchange-bullet"></div>
-                        <span>技能一</span>
+                        <div class="exchange-text" contenteditable="true" data-placeholder="技能一">技能一</div>
                     </div>
                     <div class="exchange-item">
                         <div class="exchange-bullet"></div>
-                        <span>技能二</span>
+                        <div class="exchange-text" contenteditable="true" data-placeholder="技能二">技能二</div>
                     </div>
                 </div>
             </div>
@@ -595,19 +700,103 @@
                 <div class="exchange-content">
                     <div class="exchange-item">
                         <div class="exchange-bullet"></div>
-                        <span>目标一</span>
+                        <div class="exchange-text" contenteditable="true" data-placeholder="目标一">目标一</div>
                     </div>
                     <div class="exchange-item">
                         <div class="exchange-bullet"></div>
-                        <span>目标二</span>
+                        <div class="exchange-text" contenteditable="true" data-placeholder="目标二">目标二</div>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="footer">
-            <div class="footer-text">THANK YOU FOR READING</div>
+            <div class="footer-text" contenteditable="true" data-placeholder="THANK YOU FOR READING">THANK YOU FOR READING</div>
         </div>
     </div>
+
+    <script>
+        // 能量条交互
+        const energyBar = document.getElementById('energyBar');
+        const energyText = document.getElementById('energyText');
+        const starLabels = ['ONE STAR', 'TWO STARS', 'THREE STARS', 'FOUR STARS', 'FIVE STARS'];
+
+        energyBar.addEventListener('click', function(e) {
+            if (e.target.classList.contains('star')) {
+                const index = parseInt(e.target.dataset.index);
+                const stars = energyBar.querySelectorAll('.star');
+                stars.forEach((star, i) => {
+                    if (i <= index) {
+                        star.classList.add('active');
+                        star.classList.remove('inactive');
+                    } else {
+                        star.classList.remove('active');
+                        star.classList.add('inactive');
+                    }
+                });
+                energyText.textContent = starLabels[index];
+            }
+        });
+
+        // 添加标签
+        function addTag() {
+            const container = document.getElementById('tagsContainer');
+            const addBtn = container.querySelector('.tag-add');
+            const newTag = document.createElement('div');
+            newTag.className = 'tag';
+            newTag.contentEditable = true;
+            newTag.dataset.placeholder = '#新标签';
+            newTag.textContent = '#新标签';
+            container.insertBefore(newTag, addBtn);
+            newTag.focus();
+        }
+
+        // 导出PDF
+        function exportPDF() {
+            const card = document.getElementById('card');
+            const opt = {
+                margin: 0,
+                filename: 'social-card.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: {
+                    scale: 2,
+                    useCORS: true,
+                    backgroundColor: '#0d0d0d',
+                    logging: false
+                },
+                jsPDF: {
+                    unit: 'mm',
+                    format: [100, 180],
+                    orientation: 'portrait'
+                }
+            };
+            html2pdf().set(opt).from(card).save();
+        }
+
+        // 重置内容
+        function resetData() {
+            if (confirm('确定要重置所有内容为默认值吗？')) {
+                location.reload();
+            }
+        }
+
+        // 防止回车换行在某些元素中
+        document.querySelectorAll('.info-value, .section-number, .section-date, .social-link').forEach(el => {
+            el.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    el.blur();
+                }
+            });
+        });
+
+        // 标签回车处理
+        document.getElementById('tagsContainer').addEventListener('keydown', function(e) {
+            if (e.target.classList.contains('tag') && e.key === 'Enter') {
+                e.preventDefault();
+                e.target.blur();
+            }
+        });
+    </script>
 </body>
 </html>
